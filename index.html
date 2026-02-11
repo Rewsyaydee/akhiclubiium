@@ -1,0 +1,1669 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AKHI CLUB IIUM | Outreach & Character</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;700;900&family=JetBrains+Mono:wght@300;500&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --cyanotype-deep: #001a2c;
+            --cyanotype-mid: #004a7c;
+            --cyanotype-light: #b3d4e5;
+            --cyanotype-paper: #f4f9fc;
+            --accent: #00ccff;
+        }
+
+        body {
+            background-color: var(--cyanotype-paper);
+            color: var(--cyanotype-deep);
+            font-family: 'Inter', sans-serif;
+            overflow-x: hidden;
+        }
+
+        .grain-overlay {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            pointer-events: none;
+            z-index: 9999;
+            opacity: 0.04;
+            background: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+        }
+
+        * { cursor: none; }
+
+        #cursor {
+            width: 20px;
+            height: 20px;
+            background: white;
+            border-radius: 50%;
+            position: fixed;
+            pointer-events: none;
+            z-index: 9998;
+            mix-blend-mode: difference;
+            transition: transform 0.1s ease;
+        }
+
+        .blueprint-grid {
+            background-image: 
+                linear-gradient(rgba(0, 74, 124, 0.1) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(0, 74, 124, 0.1) 1px, transparent 1px);
+            background-size: 40px 40px;
+        }
+
+        .mono { font-family: 'JetBrains Mono', monospace; }
+
+        .hero-gradient {
+            background: radial-gradient(circle at center, var(--cyanotype-mid), var(--cyanotype-deep));
+        }
+
+        .cyanotype-card {
+            background: var(--cyanotype-paper);
+            border: 1px solid var(--cyanotype-mid);
+            transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+            position: relative;
+        }
+
+        .cyanotype-card::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: var(--cyanotype-mid);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            z-index: -1;
+        }
+
+        .cyanotype-card:hover {
+            color: white;
+            transform: translateY(-5px);
+        }
+
+        .cyanotype-card:hover::after {
+            opacity: 1;
+        }
+
+        .img-container {
+            filter: none;
+            transition: filter 0.5s ease;
+        }
+
+        .img-container:hover {
+            filter: brightness(1.1);
+        }
+
+        .nav-link {
+            position: relative;
+            overflow: hidden;
+        }
+
+        .nav-link::after {
+            content: '';
+            position: absolute;
+            bottom: 0; left: 0;
+            width: 100%; height: 1px;
+            background: currentColor;
+            transform: translateX(-101%);
+            transition: transform 0.3s ease;
+        }
+
+        .nav-link:hover::after {
+            transform: translateX(0);
+        }
+
+        .reveal {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: all 0.8s ease-out;
+        }
+
+        .reveal.active {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .section-title {
+            writing-mode: vertical-rl;
+            text-orientation: mixed;
+            transform: rotate(180deg);
+        }
+
+        input, textarea {
+            background: transparent;
+            border-bottom: 2px solid var(--cyanotype-mid);
+            padding: 1rem 0;
+            width: 100%;
+            outline: none;
+            transition: border-color 0.3s ease;
+        }
+
+        input:focus {
+            border-color: var(--accent);
+        }
+
+        .blueprint-border {
+            border: 1px solid rgba(0, 74, 124, 0.2);
+            position: relative;
+        }
+
+        .blueprint-border::before {
+            content: attr(data-label);
+            position: absolute;
+            top: -10px; left: 20px;
+            background: var(--cyanotype-paper);
+            padding: 0 10px;
+            font-size: 10px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            color: var(--cyanotype-mid);
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        .lightbox-overlay {
+            backdrop-filter: blur(6px);
+        }
+        .thumb-active {
+            outline: 2px solid var(--accent);
+            outline-offset: 3px;
+        }
+
+        .archive-gallery {
+            display: flex;
+            gap: 2rem;
+            overflow-x: auto;
+            padding: 2rem 0 4rem;
+            scrollbar-width: none;
+            scroll-behavior: smooth;
+        }
+
+        .archive-gallery::-webkit-scrollbar {
+            display: none;
+        }
+
+        .archive-gallery .blueprint-border {
+            min-width: 320px;
+            max-width: 380px;
+            flex-shrink: 0;
+        }
+
+        .archive-gallery .aspect-\[4\/5\] {
+            aspect-ratio: 3/4;
+        }
+
+        /* Card Flip Animation Styles */
+        .card {
+            overflow: visible;
+            width: 190px;
+            height: 254px;
+            perspective: 1200px;
+        }
+
+        .content {
+            width: 100%;
+            height: 100%;
+            transform-style: preserve-3d;
+            transition: transform 220ms ease-out;
+            box-shadow: 0px 0px 10px 1px #000000ee;
+            border-radius: 5px;
+            will-change: transform;
+        }
+
+        .front, .back {
+            background-color: #151515;
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            backface-visibility: hidden;
+            -webkit-backface-visibility: hidden;
+            border-radius: 5px;
+            overflow: hidden;
+        }
+
+        .back {
+            width: 100%;
+            height: 100%;
+            justify-content: center;
+            display: flex;
+            align-items: center;
+            overflow: hidden;
+            background-color: #000;
+        }
+
+        .back-img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            object-position: center;
+        }
+
+        .back::before {
+            position: absolute;
+            content: ' ';
+            display: none;
+            width: 160px;
+            height: 160%;
+            background: linear-gradient(90deg, transparent, #ff9966, #ff9966, #ff9966, #ff9966, transparent);
+            animation: rotation_481 5000ms infinite linear;
+        }
+
+        .back-content {
+            position: absolute;
+            width: 99%;
+            height: 99%;
+            background-color: #151515;
+            border-radius: 5px;
+            color: white;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            gap: 30px;
+        }
+
+        .card:hover .content {
+            transform: rotateY(180deg);
+        }
+
+        @keyframes rotation_481 {
+            0% {
+                transform: rotateZ(0deg);
+            }
+            100% {
+                transform: rotateZ(360deg);
+            }
+        }
+
+        .front {
+            color: white;
+            transform: rotateY(0deg);
+        }
+
+        .back {
+            transform: rotateY(180deg);
+        }
+
+        .front .front-content {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            padding: 10px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .card-logo {
+            width: 50px;
+            height: 50px;
+            object-fit: contain;
+            margin: 0 auto;
+            display: block;
+        }
+
+        .front-content .badge {
+            background-color: #00000055;
+            padding: 2px 10px;
+            border-radius: 10px;
+            backdrop-filter: blur(2px);
+            width: fit-content;
+        }
+
+        .description {
+            box-shadow: 0px 0px 10px 5px #00000088;
+            width: 100%;
+            padding: 10px;
+            background-color: #00000099;
+            backdrop-filter: blur(5px);
+            border-radius: 5px;
+        }
+
+        .title {
+            font-size: 11px;
+            max-width: 100%;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .title p {
+            width: 50%;
+        }
+
+        .card-footer {
+            color: #ffffff88;
+            margin-top: 5px;
+            font-size: 8px;
+        }
+
+        .front .img {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            object-position: center;
+        }
+
+        .circle {
+            width: 90px;
+            height: 90px;
+            border-radius: 50%;
+            background-color: #00ccff;
+            position: relative;
+            filter: blur(15px);
+            animation: floating 2600ms infinite linear;
+        }
+
+        #bottom {
+            background-color: #0099ff;
+            left: 50px;
+            top: 0px;
+            width: 150px;
+            height: 150px;
+            animation-delay: -800ms;
+        }
+
+        #right {
+            background-color: #004a7c;
+            left: 160px;
+            top: -80px;
+            width: 30px;
+            height: 30px;
+            animation-delay: -1800ms;
+        }
+
+        @keyframes floating {
+            0% {
+                transform: translateY(0px);
+            }
+            50% {
+                transform: translateY(10px);
+            }
+            100% {
+                transform: translateY(0px);
+            }
+        }
+    </style>
+</head>
+<body class="blueprint-grid">
+    <div id="cursor"></div>
+    <div class="grain-overlay"></div>
+
+    <!-- Navigation -->
+    <nav class="fixed w-full z-50 mix-blend-difference text-white px-8 py-6 flex justify-between items-center">
+        <div class="text-2xl font-black tracking-tighter">AKHI CLUB <span class="text-xs align-top font-light mono">IIUM</span></div>
+        <div class="hidden md:flex gap-12 font-medium mono text-xs uppercase tracking-widest">
+            <a href="#about" class="nav-link">Initiative</a>
+            <a href="#gallery" class="nav-link">Archive</a>
+            <a href="#lineup" class="nav-link">Structure</a>
+            <a href="#partnership" class="nav-link bg-white text-black px-4 py-2">Join Forces</a>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <header class="min-h-screen flex flex-col justify-end p-8 md:p-16 hero-gradient text-white relative overflow-hidden">
+        <div class="absolute inset-0 opacity-20">
+            <svg class="w-full h-full" viewBox="0 0 100 100" preserveAspectRatio="none">
+                <path d="M0 100 C 20 0, 50 0, 100 100" stroke="white" stroke-width="0.1" fill="transparent" />
+                <path d="M0 80 C 30 20, 70 20, 100 80" stroke="white" stroke-width="0.1" fill="transparent" />
+            </svg>
+        </div>
+        <div class="z-10">
+            <p class="mono text-sm uppercase tracking-[0.5em] mb-4 text-cyan-400">Anak-anak Berakhlak Islam</p>
+            <h1 class="text-5xl md:text-[9rem] font-black leading-[0.92] tracking-tighter mb-8">
+                TOWARDS THE<br>EXCELLENCE<br>OF ISLAMIC GENERATION.
+            </h1>
+            <div class="max-w-2xl">
+                <p class="text-xl md:text-2xl font-light leading-relaxed opacity-80">
+                    We bridge the gap between higher education and primary growth, cultivating a generation of secondary and primary students with resilient Islamic character through immersive outreach.
+                </p>
+            </div>
+        </div>
+        <div class="absolute bottom-16 right-16 hidden md:block">
+            <div class="w-32 h-32 border border-white/30 rounded-full flex items-center justify-center animate-spin-slow">
+                <svg class="w-12 h-12 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M19 14l-7 7m0 0l-7-7m7 7V3" />
+                </svg>
+            </div>
+        </div>
+    </header>
+
+    <!-- Vision & Mission Section -->
+    <section class="py-20 px-8 md:px-16 bg-white/80 text-[#001a2c] border-b border-blue-900/10">
+        <div class="max-w-4xl mx-auto flex flex-col md:flex-row gap-16 md:gap-32 items-start">
+            <div class="flex-1">
+                <h2 class="text-3xl md:text-5xl font-black mb-6 text-cyan-600">Vision</h2>
+                <p class="text-lg md:text-xl font-light leading-relaxed">
+                    To be established as one of the most aggressive and effective Islamic mentoring based clubs in Gombak.
+                </p>
+            </div>
+            <div class="flex-1">
+                <h2 class="text-3xl md:text-5xl font-black mb-6 text-cyan-600">Mission</h2>
+                <p class="text-lg md:text-xl font-light leading-relaxed">
+                    To harmonize Islamic values in all aspects of life among IIUM students and the society.
+                </p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Archive / Gallery -->
+    <section id="gallery" class="py-32 flex gap-12">
+        <div class="hidden md:block pl-8 md:pl-16">
+            <h2 class="section-title text-4xl font-black uppercase opacity-20 sticky top-32">Past Expeditions</h2>
+        </div>
+        <div class="flex-1 overflow-hidden">
+            <div class="archive-gallery pl-8 md:pl-0 pr-8 md:pr-16">
+                <!-- Entry 1 -->
+                <div class="blueprint-border p-4 reveal cursor-pointer open-archive" data-label="Archive_001" data-album="bright_3">
+                    <div class="overflow-hidden mb-6 bg-slate-900 aspect-[4/5]">
+                        <img src="testinghtml/media/Bright Future Project 3.0/_CSC0465.jpg" alt="Bright Future Project 3.0" class="img-container w-full h-full object-cover">
+                    </div>
+                    <p class="mono text-[10px] uppercase opacity-50 mb-2">Location: SMS HULU SELANGOR</p>
+                    <h3 class="text-2xl font-bold mb-4">Bright Future Project 3.0</h3>
+                    <p class="text-sm opacity-70 leading-relaxed">Leadership, outreach, and student engagement highlights.</p>
+                    <p class="text-xs mono uppercase opacity-50 mt-4">Click to view album →</p>
+                </div>
+                <!-- Entry 2 -->
+                <div class="blueprint-border p-4 reveal cursor-pointer open-archive" data-label="Archive_002" data-album="bright_1" style="transition-delay: 0.2s;">
+                    <div class="overflow-hidden mb-6 bg-slate-900 aspect-[4/5]">
+                        <img src="testinghtml/media/Bright Future Project 1.0/IMG_9680.JPG" alt="Bright Future Project 1.0" class="img-container w-full h-full object-cover">
+                    </div>
+                    <p class="mono text-[10px] uppercase opacity-50 mb-2">Location: MELAKA</p>
+                    <h3 class="text-2xl font-bold mb-4">Bright Future Project 1.0</h3>
+                    <p class="text-sm opacity-70 leading-relaxed">Educational tour blending heritage and leadership lessons.</p>
+                    <p class="text-xs mono uppercase opacity-50 mt-4">Click to view album →</p>
+                </div>
+                <!-- Entry 3 -->
+                <div class="blueprint-border p-4 reveal cursor-pointer open-archive" data-label="Archive_003" data-album="fateh_1" style="transition-delay: 0.4s;">
+                    <div class="overflow-hidden mb-6 bg-slate-900 aspect-[4/5]">
+                        <img src="testinghtml/media/Fateh 1.0/DSC_0274.JPG" alt="Fateh 1.0" class="img-container w-full h-full object-cover">
+                    </div>
+                    <p class="mono text-[10px] uppercase opacity-50 mb-2">Location: KLANG GATE</p>
+                    <h3 class="text-2xl font-bold mb-4">Fateh 1.0</h3>
+                    <p class="text-sm opacity-70 leading-relaxed">Early-stage character building and outreach moments.</p>
+                    <p class="text-xs mono uppercase opacity-50 mt-4">Click to view album →</p>
+                </div>
+                <!-- Entry 4 -->
+                <div class="blueprint-border p-4 reveal cursor-pointer open-archive" data-label="Archive_004" data-album="fateh_2" style="transition-delay: 0.6s;">
+                    <div class="overflow-hidden mb-6 bg-slate-900 aspect-[4/5]">
+                        <img src="testinghtml/media/Fateh 2.0/IMG_2968.JPG" alt="Fateh 2.0" class="img-container w-full h-full object-cover">
+                    </div>
+                    <p class="mono text-[10px] uppercase opacity-50 mb-2">Location: SAMT KUALA KUBU BHARU</p>
+                    <h3 class="text-2xl font-bold mb-4">Fateh 2.0</h3>
+                    <p class="text-sm opacity-70 leading-relaxed">Mentorship, sports drills, and halaqah circles.</p>
+                    <p class="text-xs mono uppercase opacity-50 mt-4">Click to view album →</p>
+                </div>
+                <!-- Entry 5 -->
+                <div class="blueprint-border p-4 reveal cursor-pointer open-archive" data-label="Archive_005" data-album="fateh_3" style="transition-delay: 0.8s;">
+                    <div class="overflow-hidden mb-6 bg-slate-900 aspect-[4/5]">
+                        <img src="testinghtml/media/Fateh 3.0/IMG_8743.jpg" alt="Fateh 3.0" class="img-container w-full h-full object-cover">
+                    </div>
+                    <p class="mono text-[10px] uppercase opacity-50 mb-2">Location: SBPI SABAK BERNAM</p>
+                    <h3 class="text-2xl font-bold mb-4">Fateh 3.0</h3>
+                    <p class="text-sm opacity-70 leading-relaxed">Rural outreach, sports, and community engagement.</p>
+                    <p class="text-xs mono uppercase opacity-50 mt-4">Click to view album →</p>
+                </div>
+                <!-- Entry 6 -->
+                <div class="blueprint-border p-4 reveal cursor-pointer open-archive" data-label="Archive_006" data-album="aulad_2" style="transition-delay: 1s;">
+                    <div class="overflow-hidden mb-6 bg-slate-900 aspect-[4/5]">
+                        <img src="testinghtml/media/Aulad 2.0/IMG_2831.jpg" alt="Aulad 2.0" class="img-container w-full h-full object-cover">
+                    </div>
+                    <p class="mono text-[10px] uppercase opacity-50 mb-2">Location: SEREMBAN</p>
+                    <h3 class="text-2xl font-bold mb-4">Aulad 2.0</h3>
+                    <p class="text-sm opacity-70 leading-relaxed">Primary school program with ethics and character focus.</p>
+                    <p class="text-xs mono uppercase opacity-50 mt-4">Click to view album →</p>
+                </div>
+                <!-- Entry 7 -->
+                <div class="blueprint-border p-4 reveal cursor-pointer open-archive" data-label="Archive_007" data-album="aulad_3" style="transition-delay: 1.2s;">
+                    <div class="overflow-hidden mb-6 bg-slate-900 aspect-[4/5]">
+                        <img src="testinghtml/media/Aulad 3.0/DSC_0738.JPG" alt="Aulad 3.0" class="img-container w-full h-full object-cover">
+                    </div>
+                    <p class="mono text-[10px] uppercase opacity-50 mb-2">Location: TERENGGANU</p>
+                    <h3 class="text-2xl font-bold mb-4">Aulad 3.0</h3>
+                    <p class="text-sm opacity-70 leading-relaxed">Community engagement and outdoor activities.</p>
+                    <p class="text-xs mono uppercase opacity-50 mt-4">Click to view album →</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Album Lightbox -->
+    <div id="album-overlay" class="hidden fixed inset-0 bg-black/80 text-white z-[60] lightbox-overlay">
+        <div class="max-w-6xl mx-auto h-full flex flex-col gap-6 p-6 md:p-10">
+            <div class="flex justify-between items-start gap-4">
+                <div>
+                    <p id="album-meta" class="mono text-xs uppercase tracking-[0.3em] opacity-60">Album</p>
+                    <h3 id="album-title" class="text-3xl md:text-4xl font-black">Album Title</h3>
+                    <p id="album-desc" class="opacity-70 text-sm md:text-base mt-2">Description</p>
+                </div>
+                <div class="flex items-center gap-2">
+                    <button id="album-prev" class="bg-white/10 px-4 py-2 mono text-xs uppercase hover:bg-white/20">Prev</button>
+                    <button id="album-next" class="bg-white/10 px-4 py-2 mono text-xs uppercase hover:bg-white/20">Next</button>
+                    <button id="album-close" class="bg-[#00ccff] text-black px-4 py-2 mono text-xs uppercase">Close</button>
+                </div>
+            </div>
+
+            <div id="album-viewer" class="flex-1 bg-white/5 border border-white/10 rounded-xl overflow-hidden flex items-center justify-center min-h-[320px]"></div>
+
+            <div class="overflow-x-auto">
+                <div id="album-thumbs" class="grid grid-flow-col auto-cols-[140px] gap-3 pb-2"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Organization Chart -->
+    <section id="lineup" class="py-32 bg-[#001a2c] text-[#f4f9fc]">
+        <div class="px-8 md:px-16">
+            <h2 class="text-5xl md:text-8xl font-black mb-24 tracking-tighter">THE AKHI<br><span class="text-blue-500">LINEUP 25/26</span></h2>
+            
+            <!-- HIGH COMMITTEE -->
+            <div class="mb-32 reveal">
+                <h3 class="text-3xl font-bold mb-12 text-cyan-400 border-b border-white/20 pb-4">HIGH COMMITTEE</h3>
+                <div class="flex flex-wrap gap-6 justify-center">
+                    <!-- President -->
+                    <div class="card">
+                        <div class="content">
+                            <div class="front">
+                                <div class="img">
+                                    <div class="circle"></div>
+                                    <div class="circle" id="right"></div>
+                                    <div class="circle" id="bottom"></div>
+                                </div>
+                                <div class="front-content">
+                                    <small class="badge">President</small>
+                                    <div style="text-align: center;">
+                                        <img src="testinghtml/media/akhilogo.png" alt="AKHI Logo" class="card-logo">
+                                    </div>
+                                    <div class="description">
+                                        <div class="title">
+                                            <p class="title"><strong>Harith&nbsp;Danial<br>bin Hanafi</strong></p>
+                                        </div>
+                                        <p class="card-footer">Strategic Vision</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="back">
+                                <img src="testinghtml/media/team-members/Harith.JPG" alt="Hazim" class="back-img">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Vice President 1 -->
+                    <div class="card">
+                        <div class="content">
+                            <div class="back">
+                                <img src="testinghtml/media/team-members/Hanania.JPG" alt="Hanania" class="back-img">
+                            </div>
+                            <div class="front">
+                                <div class="img">
+                                    <div class="circle"></div>
+                                    <div class="circle" id="right"></div>
+                                    <div class="circle" id="bottom"></div>
+                                </div>
+                                <div class="front-content">
+                                    <small class="badge">Vice President 1</small>
+                                    <div style="text-align: center;">
+                                        <img src="testinghtml/media/akhilogo.png" alt="AKHI Logo" class="card-logo">
+                                    </div>
+                                    <div class="description">
+                                        <div class="title">
+                                            <p class="title"><strong>Hanania&nbsp;binti<br>Md Faizal</strong></p>
+                                        </div>
+                                        <p class="card-footer">Internal Operations</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Vice President 2 -->
+                    <div class="card">
+                        <div class="content">
+                            <div class="back">
+                                <img src="testinghtml/media/team-members/Farisyah.jpg" alt="Nuraina Farisya" class="back-img">
+                            </div>
+                            <div class="front">
+                                <div class="img">
+                                    <div class="circle"></div>
+                                    <div class="circle" id="right"></div>
+                                    <div class="circle" id="bottom"></div>
+                                </div>
+                                <div class="front-content">
+                                    <small class="badge">Vice President 2</small>
+                                    <div style="text-align: center;">
+                                        <img src="testinghtml/media/akhilogo.png" alt="AKHI Logo" class="card-logo">
+                                    </div>
+                                    <div class="description">
+                                        <div class="title">
+                                            <p class="title"><strong>Nuraina&nbsp;Farisya<br>binti Mohd Haidzri</strong></p>
+                                        </div>
+                                        <p class="card-footer">External Relations</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Secretary 1 -->
+                    <div class="card">
+                        <div class="content">
+                            <div class="back">
+                                <img src="testinghtml/media/team-members/Izzah.JPG" alt="Nurul Izzah" class="back-img">
+                            </div>
+                            <div class="front">
+                                <div class="img">
+                                    <div class="circle"></div>
+                                    <div class="circle" id="right"></div>
+                                    <div class="circle" id="bottom"></div>
+                                </div>
+                                <div class="front-content">
+                                    <small class="badge">Secretary 1</small>
+                                    <div style="text-align: center;">
+                                        <img src="testinghtml/media/akhilogo.png" alt="AKHI Logo" class="card-logo">
+                                    </div>
+                                    <div class="description">
+                                        <div class="title">
+                                            <p class="title"><strong>Nurul&nbsp;Izzah<br>binti Ahmad Fadzil</strong></p>
+                                        </div>
+                                        <p class="card-footer">Documentation</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Secretary 2 -->
+                    <div class="card">
+                        <div class="content">
+                            <div class="back">
+                                <img src="testinghtml/media/team-members/Qistina.jpg" alt="Nurin Qistina" class="back-img">
+                            </div>
+                            <div class="front">
+                                <div class="img">
+                                    <div class="circle"></div>
+                                    <div class="circle" id="right"></div>
+                                    <div class="circle" id="bottom"></div>
+                                </div>
+                                <div class="front-content">
+                                    <small class="badge">Secretary 2</small>
+                                    <div style="text-align: center;">
+                                        <img src="testinghtml/media/akhilogo.png" alt="AKHI Logo" class="card-logo">
+                                    </div>
+                                    <div class="description">
+                                        <div class="title">
+                                            <p class="title"><strong>Nurin&nbsp;Qistina<br>binti Mohd Fakri</strong></p>
+                                        </div>
+                                        <p class="card-footer">Communications</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Financial Controller 1 -->
+                    <div class="card">
+                        <div class="content">
+                            <div class="back">
+                                <img src="testinghtml/media/team-members/sharifah.jpg" alt="Sharifah Khalisah" class="back-img">
+                            </div>
+                            <div class="front">
+                                <div class="img">
+                                    <div class="circle"></div>
+                                    <div class="circle" id="right"></div>
+                                    <div class="circle" id="bottom"></div>
+                                </div>
+                                <div class="front-content">
+                                    <small class="badge">Financial Controller 1</small>
+                                    <div style="text-align: center;">
+                                        <img src="testinghtml/media/akhilogo.png" alt="AKHI Logo" class="card-logo">
+                                    </div>
+                                    <div class="description">
+                                        <div class="title">
+                                            <p class="title"><strong>Sharifah&nbsp;Khalisah<br>binti Mohd Ajis</strong></p>
+                                        </div>
+                                        <p class="card-footer">Budget Management</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Financial Controller 2 -->
+                    <div class="card">
+                        <div class="content">
+                            <div class="back">
+                                <div class="back-content">
+                                    <svg stroke="#ffffff" viewBox="0 0 50 50" height="50px" width="50px" fill="#ffffff"><path d="M25 2C12.3 2 2 12.3 2 25s10.3 23 23 23 23-10.3 23-23S37.7 2 25 2m0 44C12.95 44 4 35.05 4 25S12.95 6 25 6s21 8.95 21 21-8.95 21-21 21m9-23h-8v-8h-2v8h-8v2h8v8h2v-8h8v-2z"/></svg>
+                                    <strong>Financial Controller 2</strong>
+                                </div>
+                            </div>
+                            <div class="front">
+                                <div class="img">
+                                    <div class="circle"></div>
+                                    <div class="circle" id="right"></div>
+                                    <div class="circle" id="bottom"></div>
+                                </div>
+                                <div class="front-content">
+                                    <small class="badge">Financial Controller 2</small>
+                                    <div style="text-align: center;">
+                                        <img src="testinghtml/media/akhilogo.png" alt="AKHI Logo" class="card-logo">
+                                    </div>
+                                    <div class="description">
+                                        <div class="title">
+                                            <p class="title"><strong>Muhammad&nbsp;Hazim<br>Bin Mansor</strong></p>
+                                        </div>
+                                        <p class="card-footer">Financial Planning</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="back">
+                                <img src="testinghtml/media/team-members/Hazim.jpg" alt="Muhammad Hazim" class="back-img">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- HUMAN RESOURCES -->
+            <div class="mb-32 reveal" style="transition-delay: 0.1s;">
+                <h3 class="text-3xl font-bold mb-12 text-cyan-400 border-b border-white/20 pb-4">HUMAN RESOURCES</h3>
+                <div class="flex flex-wrap gap-6 justify-center">
+                    <div class="card">
+                        <div class="content">
+                            <div class="back"><img src="testinghtml/media/team-members/Irsyad.JPG" alt="Irsyad" class="back-img"></div>
+                            <div class="front"><div class="img"><div class="circle"></div><div class="circle" id="right"></div><div class="circle" id="bottom"></div></div><div class="front-content"><small class="badge">HR</small><div style="text-align: center;"><img src="testinghtml/media/akhilogo.png" alt="AKHI Logo" class="card-logo"></div><div class="description"><div class="title"><p class="title"><strong>Irsyad Fahmi bin Miswan</strong></p></div><p class="card-footer">Team Management</p></div></div></div>
+                        </div>
+                    </div>
+                    <div class="card">
+                        <div class="content">
+                            <div class="back"><img src="testinghtml/media/team-members/Anis_.jpg" alt="Anis" class="back-img"></div>
+                            <div class="front"><div class="img"><div class="circle"></div><div class="circle" id="right"></div><div class="circle" id="bottom"></div></div><div class="front-content"><small class="badge">HR</small><div style="text-align: center;"><img src="testinghtml/media/akhilogo.png" alt="AKHI Logo" class="card-logo"></div><div class="description"><div class="title"><p class="title"><strong>Anis&nbsp;Ruhaya<br>Amani binti Abdul Jalil</strong></p></div><p class="card-footer">Member Welfare</p></div></div></div>
+                        </div>
+                    </div>
+                    <div class="card">
+                        <div class="content">
+                            <div class="back"><img src="testinghtml/media/team-members/Nurin.jpg" alt="Nurin" class="back-img"></div>
+                            <div class="front"><div class="img"><div class="circle"></div><div class="circle" id="right"></div><div class="circle" id="bottom"></div></div><div class="front-content"><small class="badge">HR</small><div style="text-align: center;"><img src="testinghtml/media/akhilogo.png" alt="AKHI Logo" class="card-logo"></div><div class="description"><div class="title"><p class="title long-name"><strong>Nurin&nbsp;Batrisya&nbsp;@&nbsp;Siti&nbsp;Nur<br>Rihhadatul&nbsp;‘Aisy<br>binti&nbsp;Mohammad&nbsp;Amir</strong></p></div><p class="card-footer">HR Admin</p></div></div></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ENTREPRENEURSHIP -->
+            <div class="mb-32 reveal" style="transition-delay: 0.2s;">
+                <h3 class="text-3xl font-bold mb-12 text-cyan-400 border-b border-white/20 pb-4">ENTREPRENEURSHIP</h3>
+                <div class="flex flex-wrap gap-6 justify-center">
+                    <div class="card">
+                        <div class="content">
+                            <div class="back"><img src="testinghtml/media/team-members/Azwan.jpg" alt="Azwan" class="back-img"></div>
+                            <div class="front"><div class="img"><div class="circle"></div><div class="circle" id="right"></div><div class="circle" id="bottom"></div></div><div class="front-content"><small class="badge">Entrepren</small><div style="text-align: center;"><img src="testinghtml/media/akhilogo.png" alt="AKHI Logo" class="card-logo"></div><div class="description"><div class="title"><p class="title"><strong>Muhammad&nbsp;Azwan<br>bin Mohd Faizal</strong></p></div><p class="card-footer">Business Dev</p></div></div></div>
+                        </div>
+                    </div>
+                    <div class="card">
+                        <div class="content">
+                            <div class="back"><img src="testinghtml/media/team-members/sharifah.jpg" alt="sharifah" class="back-img"></div>
+                            <div class="front"><div class="img"><div class="circle"></div><div class="circle" id="right"></div><div class="circle" id="bottom"></div></div><div class="front-content"><small class="badge">Entrepren</small><div style="text-align: center;"><img src="testinghtml/media/akhilogo.png" alt="AKHI Logo" class="card-logo"></div><div class="description"><div class="title"><p class="title"><strong>Raja&nbsp;Nurul&nbsp;Nadia<br>binti Raja Yahaya</strong></p></div><p class="card-footer">Project Mgmt</p></div></div></div>
+                        </div>
+                    </div>
+                    <div class="card">
+                        <div class="content">
+                            <div class="back"><img src="testinghtml/media/team-members/Mukhrizq.JPG" alt="Mukhrizq" class="back-img"></div>
+                            <div class="front"><div class="img"><div class="circle"></div><div class="circle" id="right"></div><div class="circle" id="bottom"></div></div><div class="front-content"><small class="badge">Entrepren</small><div style="text-align: center;"><img src="testinghtml/media/akhilogo.png" alt="AKHI Logo" class="card-logo"></div><div class="description"><div class="title"><p class="title"><strong>Muhammad&nbsp;Mukhrizq<br>Wafiq bin Mohd Masri</strong></p></div><p class="card-footer">Project Mgmt</p></div></div></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- MULTIMEDIA -->
+            <div class="mb-32 reveal" style="transition-delay: 0.3s;">
+                <h3 class="text-3xl font-bold mb-12 text-cyan-400 border-b border-white/20 pb-4">MULTIMEDIA</h3>
+                <div class="flex flex-wrap gap-6 justify-center">
+                    <div class="card">
+                        <div class="content">
+                            <div class="back"><img src="testinghtml/media/team-members/Fatin.jpg" alt="Fatin" class="back-img"></div>
+                            <div class="front"><div class="img"><div class="circle"></div><div class="circle" id="right"></div><div class="circle" id="bottom"></div></div><div class="front-content"><small class="badge">Media</small><div style="text-align: center;"><img src="testinghtml/media/akhilogo.png" alt="AKHI Logo" class="card-logo"></div><div class="description"><div class="title"><p class="title"><strong>Nur Iffa Firzanah binti Noor Affandy</strong></p></div><p class="card-footer">Content Creat</p></div></div></div>
+                        </div>
+                    </div>
+                    <div class="card">
+                        <div class="content">
+                            <div class="back"><img src="testinghtml/media/team-members/Luqman.JPG" alt="Luqman" class="back-img"></div>
+                            <div class="front"><div class="img"><div class="circle"></div><div class="circle" id="right"></div><div class="circle" id="bottom"></div></div><div class="front-content"><small class="badge">Media</small><div style="text-align: center;"><img src="testinghtml/media/akhilogo.png" alt="AKHI Logo" class="card-logo"></div><div class="description"><div class="title"><p class="title"><strong>Nuha Adilah binti Muliadi</strong></p></div><p class="card-footer">Video/Photo</p></div></div></div>
+                        </div>
+                    </div>
+                    <div class="card">
+                        <div class="content">
+                            <div class="back"><img src="testinghtml/media/team-members/Ahmad.jpg" alt="Ahmad Syihaam" class="back-img"></div>
+                            <div class="front"><div class="img"><div class="circle"></div><div class="circle" id="right"></div><div class="circle" id="bottom"></div></div><div class="front-content"><small class="badge">Media</small><div style="text-align: center;"><img src="testinghtml/media/akhilogo.png" alt="AKHI Logo" class="card-logo"></div><div class="description"><div class="title"><p class="title"><strong>Hasanawiyah binti Harun</strong></p></div><p class="card-footer">Digital Mktg</p></div></div></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- AULAD -->
+            <div class="mb-32 reveal" style="transition-delay: 0.4s;">
+                <h3 class="text-3xl font-bold mb-12 text-cyan-400 border-b border-white/20 pb-4">AULAD (PRIMARY SCHOOL)</h3>
+                <div class="flex flex-wrap gap-6 justify-center">
+                    <div class="card">
+                        <div class="content">
+                            <div class="back"><img src="testinghtml/media/team-members/Akma.jpg" alt="Nurul Aliah" class="back-img"></div>
+                            <div class="front"><div class="img"><div class="circle"></div><div class="circle" id="right"></div><div class="circle" id="bottom"></div></div><div class="front-content"><small class="badge">Aulad</small><div style="text-align: center;"><img src="testinghtml/media/akhilogo.png" alt="AKHI Logo" class="card-logo"></div><div class="description"><div class="title"><p class="title"><strong>Thaqif Najmi bin Tarmizi</strong></p></div><p class="card-footer">Youth Prog</p></div></div></div>
+                        </div>
+                    </div>
+                    <div class="card">
+                        <div class="content">
+                            <div class="back"><img src="testinghtml/media/team-members/Rusyaidi.JPG" alt="Rusyaidi" class="back-img"></div>
+                            <div class="front"><div class="img"><div class="circle"></div><div class="circle" id="right"></div><div class="circle" id="bottom"></div></div><div class="front-content"><small class="badge">Aulad</small><div style="text-align: center;"><img src="testinghtml/media/akhilogo.png" alt="AKHI Logo" class="card-logo"></div><div class="description"><div class="title"><p class="title"><strong>Farah Khalisa binti Mohd Fadzli</strong></p></div><p class="card-footer">Mentorship</p></div></div></div>
+                        </div>
+                    </div>
+                    <div class="card">
+                        <div class="content">
+                            <div class="back"><img src="testinghtml/media/team-members/Aatiqah.jpg" alt="Aathiqah" class="back-img"></div>
+                            <div class="front"><div class="img"><div class="circle"></div><div class="circle" id="right"></div><div class="circle" id="bottom"></div></div><div class="front-content"><small class="badge">Aulad</small><div style="text-align: center;"><img src="testinghtml/media/akhilogo.png" alt="AKHI Logo" class="card-logo"></div><div class="description"><div class="title"><p class="title"><strong>Nur Akma Qistina binti Zam Zam</strong></p></div><p class="card-footer">Activities</p></div></div></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- TRAINING & DEVELOPMENT -->
+            <div class="mb-32 reveal" style="transition-delay: 0.5s;">
+                <h3 class="text-3xl font-bold mb-12 text-cyan-400 border-b border-white/20 pb-4">TRAINING & DEVELOPMENT</h3>
+                <div class="flex flex-wrap gap-6 justify-center">
+                    <div class="card">
+                        <div class="content">
+                            <div class="back"><div class="back-content"><svg stroke="#ffffff" viewBox="0 0 50 50" height="50px" width="50px" fill="#ffffff"><path d="M25 2C12.3 2 2 12.3 2 25s10.3 23 23 23 23-10.3 23-23S37.7 2 25 2m0 44C12.95 44 4 35.05 4 25S12.95 6 25 6s21 8.95 21 21-8.95 21-21 21m9-23h-8v-8h-2v8h-8v2h8v8h2v-8h8v-2z"/></svg><strong>Head</strong></div></div>
+                            <div class="front"><div class="img"><div class="circle"></div><div class="circle" id="right"></div><div class="circle" id="bottom"></div></div><div class="front-content"><small class="badge">Training</small><div style="text-align: center;"><img src="testinghtml/media/akhilogo.png" alt="AKHI Logo" class="card-logo"></div><div class="description"><div class="title"><p class="title"><strong>Nurul Fatin Aliah binti Bahtiar</strong></p></div><p class="card-footer">Curriculum</p></div></div></div>
+                        </div>
+                    </div>
+                    <div class="card">
+                        <div class="content">
+                            <div class="back"><div class="back-content"><svg stroke="#ffffff" viewBox="0 0 50 50" height="50px" width="50px" fill="#ffffff"><path d="M25 2C12.3 2 2 12.3 2 25s10.3 23 23 23 23-10.3 23-23S37.7 2 25 2m0 44C12.95 44 4 35.05 4 25S12.95 6 25 6s21 8.95 21 21-8.95 21-21 21m9-23h-8v-8h-2v8h-8v2h8v8h2v-8h8v-2z"/></svg><strong>Assistant 1</strong></div></div>
+                            <div class="front"><div class="img"><div class="circle"></div><div class="circle" id="right"></div><div class="circle" id="bottom"></div></div><div class="front-content"><small class="badge">Training</small><div style="text-align: center;"><img src="testinghtml/media/akhilogo.png" alt="AKHI Logo" class="card-logo"></div><div class="description"><div class="title"><p class="title"><strong>Luqman bin Mohd Noradha</strong></p></div><p class="card-footer">Skill Dev</p></div></div></div>
+                        </div>
+                    </div>
+                    <div class="card">
+                        <div class="content">
+                            <div class="back"><img src="testinghtml/media/team-members/Ahmad.jpg" alt="Ahmad Syihaam" class="back-img"></div>
+                            <div class="front"><div class="img"><div class="circle"></div><div class="circle" id="right"></div><div class="circle" id="bottom"></div></div><div class="front-content"><small class="badge">Training</small><div style="text-align: center;"><img src="testinghtml/media/akhilogo.png" alt="AKHI Logo" class="card-logo"></div><div class="description"><div class="title"><p class="title"><strong>Ahmad Syihaam bin Ahmad Rafizi</strong></p></div><p class="card-footer">Workshop</p></div></div></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- FATEH -->
+            <div class="reveal" style="transition-delay: 0.6s;">
+                <h3 class="text-3xl font-bold mb-12 text-cyan-400 border-b border-white/20 pb-4">FATEH (SECONDARY SCHOOL)</h3>
+                <div class="flex flex-wrap gap-6 justify-center">
+                    <div class="card">
+                        <div class="content">
+                            <div class="back"><div class="back-content"><svg stroke="#ffffff" viewBox="0 0 50 50" height="50px" width="50px" fill="#ffffff"><path d="M25 2C12.3 2 2 12.3 2 25s10.3 23 23 23 23-10.3 23-23S37.7 2 25 2m0 44C12.95 44 4 35.05 4 25S12.95 6 25 6s21 8.95 21 21-8.95 21-21 21m9-23h-8v-8h-2v8h-8v2h8v8h2v-8h8v-2z"/></svg><strong>Head</strong></div></div>
+                            <div class="front"><div class="img"><div class="circle"></div><div class="circle" id="right"></div><div class="circle" id="bottom"></div></div><div class="front-content"><small class="badge">Fateh</small><div style="text-align: center;"><img src="testinghtml/media/akhilogo.png" alt="AKHI Logo" class="card-logo"></div><div class="description"><div class="title"><p class="title"><strong>Nurul Aliah Qamar binti Kamaruzaman</strong></p></div><p class="card-footer">Sports Prog</p></div></div></div>
+                        </div>
+                    </div>
+                    <div class="card">
+                        <div class="content">
+                            <div class="back"><div class="back-content"><svg stroke="#ffffff" viewBox="0 0 50 50" height="50px" width="50px" fill="#ffffff"><path d="M25 2C12.3 2 2 12.3 2 25s10.3 23 23 23 23-10.3 23-23S37.7 2 25 2m0 44C12.95 44 4 35.05 4 25S12.95 6 25 6s21 8.95 21 21-8.95 21-21 21m9-23h-8v-8h-2v8h-8v2h8v8h2v-8h8v-2z"/></svg><strong>Assistant 1</strong></div></div>
+                            <div class="front"><div class="img"><div class="circle"></div><div class="circle" id="right"></div><div class="circle" id="bottom"></div></div><div class="front-content"><small class="badge">Fateh</small><div style="text-align: center;"><img src="testinghtml/media/akhilogo.png" alt="AKHI Logo" class="card-logo"></div><div class="description"><div class="title"><p class="title"><strong>Rusyaidi bin Mohd Husni</strong></p></div><p class="card-footer">Sports Coach</p></div></div></div>
+                        </div>
+                    </div>
+                    <div class="card">
+                        <div class="content">
+                            <div class="back"><div class="back-content"><svg stroke="#ffffff" viewBox="0 0 50 50" height="50px" width="50px" fill="#ffffff"><path d="M25 2C12.3 2 2 12.3 2 25s10.3 23 23 23 23-10.3 23-23S37.7 2 25 2m0 44C12.95 44 4 35.05 4 25S12.95 6 25 6s21 8.95 21 21-8.95 21-21 21m9-23h-8v-8h-2v8h-8v2h8v8h2v-8h8v-2z"/></svg><strong>Assistant 2</strong></div></div>
+                            <div class="front"><div class="img"><div class="circle"></div><div class="circle" id="right"></div><div class="circle" id="bottom"></div></div><div class="front-content"><small class="badge">Fateh</small><div style="text-align: center;"><img src="testinghtml/media/akhilogo.png" alt="AKHI Logo" class="card-logo"></div><div class="description"><div class="title"><p class="title"><strong>Nur Aathiqah binti Ajmal Ibrahim</strong></p></div><p class="card-footer">Events/Log</p></div></div></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Partnership Form -->
+    <section id="partnership" class="py-32 px-8 md:px-16 grid grid-cols-1 lg:grid-cols-2 gap-32">
+        <div class="reveal">
+            <h2 class="text-6xl font-black tracking-tight mb-8">BRING AKHI TO YOUR SCHOOL.</h2>
+            <p class="text-xl leading-relaxed opacity-70 mb-12">
+                We design bespoke outreach programs that align with your school's educational objectives. Let us collaborate to nurture the next generation of leaders.
+            </p>
+            <div class="space-y-6">
+                <div class="flex items-center gap-6">
+                    <div class="w-12 h-px bg-current"></div>
+                    <span class="mono text-sm">Official Collaboration Request</span>
+                </div>
+                <div class="flex items-center gap-6">
+                    <div class="w-12 h-px bg-current"></div>
+                    <span class="mono text-sm">Resource Development Support</span>
+                </div>
+            </div>
+        </div>
+        
+        <div class="blueprint-border p-8 md:p-16 reveal" data-label="Partnership_Form">
+            <form id="partnership-form" action="https://formsubmit.co/rusyaidi@gmail.com" method="POST" class="space-y-12">
+                <!-- Formsubmit configuration -->
+                <input type="hidden" name="_subject" value="New AKHI Partnership Request">
+                <input type="hidden" name="_captcha" value="false">
+                <input type="hidden" name="_template" value="box">
+                
+                <div>
+                    <label class="mono text-[10px] uppercase block mb-2">Institution Name</label>
+                    <input type="text" name="institution" placeholder="e.g. SMK Sultan Ahmad Shah" required>
+                </div>
+                <div class="grid grid-cols-2 gap-8">
+                    <div>
+                        <label class="mono text-[10px] uppercase block mb-2">Manager Name</label>
+                        <input type="text" name="manager_name" placeholder="Full Name" required>
+                    </div>
+                    <div>
+                        <label class="mono text-[10px] uppercase block mb-2">Email Address</label>
+                        <input type="email" name="email" placeholder="official@school.edu" required>
+                    </div>
+                </div>
+                <div>
+                    <label class="mono text-[10px] uppercase block mb-2">Program Objectives</label>
+                    <textarea name="objectives" placeholder="Briefly describe what you'd like us to focus on..." rows="4"></textarea>
+                </div>
+                <button type="submit" class="bg-[#004a7c] text-white px-12 py-4 font-bold mono uppercase text-sm hover:bg-[#00ccff] transition-colors w-full">
+                    Initiate Connection
+                </button>
+                <p id="form-status" class="mono text-xs text-green-700"></p>
+            </form>
+        </div>
+    </section>
+
+    <footer class="p-16 border-t border-blue-900/10 flex flex-col md:flex-row justify-between items-center opacity-50 mono text-[10px]">
+        <p>&copy; 2024 AKHI CLUB IIUM. DEVELOPED FOR EXCELLENCE.</p>
+        <p>INTERNATIONAL ISLAMIC UNIVERSITY MALAYSIA | GOMBAK CAMPUS</p>
+    </footer>
+
+    <script>
+        // Reveal animation on scroll
+        const observerOptions = {
+            threshold: 0.1
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('active');
+                }
+            });
+        }, observerOptions);
+
+        document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+
+        // Smooth scroll
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                document.querySelector(this.getAttribute('href')).scrollIntoView({
+                    behavior: 'smooth'
+                });
+            });
+        });
+
+        // Interactive Grain Shift on Mouse Move
+        document.addEventListener('mousemove', (e) => {
+            const grain = document.querySelector('.grain-overlay');
+            const x = (e.clientX / window.innerWidth) * 5;
+            const y = (e.clientY / window.innerHeight) * 5;
+            grain.style.transform = `translate(${x}px, ${y}px)`;
+        });
+
+        // Partnership form feedback (not needed anymore with Formsubmit)
+        // Form will redirect to Formsubmit's thank you page after submission
+
+
+        // Album data and lightbox controls
+        const albums = {
+            bright_3: {
+                title: 'Bright Future Project 3.0',
+                description: 'Leadership, outreach, and student engagement highlights.',
+                items: [
+                    { type: 'image', src: 'testinghtml/media/Bright Future Project 3.0/_CSC0465.jpg' },
+                    { type: 'image', src: 'testinghtml/media/Bright Future Project 3.0/_CSC0467.jpg' },
+                    { type: 'image', src: 'testinghtml/media/Bright Future Project 3.0/_CSC0519.jpg' },
+                    { type: 'image', src: 'testinghtml/media/Bright Future Project 3.0/_CSC0550.jpg' },
+                    { type: 'image', src: 'testinghtml/media/Bright Future Project 3.0/_CSC0562.jpg' },
+                    { type: 'image', src: 'testinghtml/media/Bright Future Project 3.0/_CSC0579.jpg' },
+                    { type: 'image', src: 'testinghtml/media/Bright Future Project 3.0/_CSC0708.jpg' },
+                    { type: 'image', src: 'testinghtml/media/Bright Future Project 3.0/_CSC0740.jpg' },
+                    { type: 'image', src: 'testinghtml/media/Bright Future Project 3.0/_DSC0001.jpg' },
+                    { type: 'image', src: 'testinghtml/media/Bright Future Project 3.0/_DSC0010.jpg' },
+                    { type: 'image', src: 'testinghtml/media/Bright Future Project 3.0/_DSC0013.jpg' },
+                    { type: 'image', src: 'testinghtml/media/Bright Future Project 3.0/_DSC0014.jpg' },
+                    { type: 'image', src: 'testinghtml/media/Bright Future Project 3.0/_DSC0015.jpg' },
+                    { type: 'image', src: 'testinghtml/media/Bright Future Project 3.0/_DSC0018.jpg' },
+                    { type: 'image', src: 'testinghtml/media/Bright Future Project 3.0/_DSC0020.jpg' },
+                    { type: 'image', src: 'testinghtml/media/Bright Future Project 3.0/_DSC0022.jpg' },
+                    { type: 'image', src: 'testinghtml/media/Bright Future Project 3.0/_DSC0024.jpg' },
+                    { type: 'image', src: 'testinghtml/media/Bright Future Project 3.0/_DSC0026.jpg' },
+                    { type: 'image', src: 'testinghtml/media/Bright Future Project 3.0/_DSC0028.jpg' },
+                    { type: 'image', src: 'testinghtml/media/Bright Future Project 3.0/_DSC0030.jpg' },
+                    { type: 'image', src: 'testinghtml/media/Bright Future Project 3.0/_DSC0032.jpg' },
+                    { type: 'image', src: 'testinghtml/media/Bright Future Project 3.0/_DSC0033.jpg' },
+                    { type: 'image', src: 'testinghtml/media/Bright Future Project 3.0/_DSC0034.jpg' },
+                    { type: 'image', src: 'testinghtml/media/Bright Future Project 3.0/_DSC0035.jpg' },
+                    { type: 'image', src: 'testinghtml/media/Bright Future Project 3.0/_DSC0036.jpg' },
+                    { type: 'image', src: 'testinghtml/media/Bright Future Project 3.0/_DSC0038.jpg' },
+                    { type: 'image', src: 'testinghtml/media/Bright Future Project 3.0/_DSC0039.jpg' },
+                    { type: 'image', src: 'testinghtml/media/Bright Future Project 3.0/_DSC0040.jpg' },
+                    { type: 'image', src: 'testinghtml/media/Bright Future Project 3.0/_DSC0041.jpg' },
+                    { type: 'image', src: 'testinghtml/media/Bright Future Project 3.0/_DSC0042.jpg' },
+                    { type: 'image', src: 'testinghtml/media/Bright Future Project 3.0/_DSC0043.jpg' },
+                    { type: 'image', src: 'testinghtml/media/Bright Future Project 3.0/_DSC0045.jpg' },
+                    { type: 'image', src: 'testinghtml/media/Bright Future Project 3.0/_DSC0048.jpg' },
+                    { type: 'image', src: 'testinghtml/media/Bright Future Project 3.0/_DSC0051.jpg' },
+                    { type: 'image', src: 'testinghtml/media/Bright Future Project 3.0/_DSC0053.jpg' },
+                    { type: 'image', src: 'testinghtml/media/Bright Future Project 3.0/_DSC0054.jpg' },
+                    { type: 'image', src: 'testinghtml/media/Bright Future Project 3.0/_DSC0055.jpg' },
+                    { type: 'image', src: 'testinghtml/media/Bright Future Project 3.0/_DSC0060.jpg' },
+                    { type: 'image', src: 'testinghtml/media/Bright Future Project 3.0/_DSC0061.jpg' },
+                    { type: 'image', src: 'testinghtml/media/Bright Future Project 3.0/_DSC0063.jpg' },
+                    { type: 'image', src: 'testinghtml/media/Bright Future Project 3.0/_DSC0064.jpg' },
+                    { type: 'image', src: 'testinghtml/media/Bright Future Project 3.0/_DSC0065.jpg' },
+                    { type: 'image', src: 'testinghtml/media/Bright Future Project 3.0/_DSC0067.jpg' },
+                    { type: 'image', src: 'testinghtml/media/Bright Future Project 3.0/_DSC0070.jpg' },
+                    { type: 'image', src: 'testinghtml/media/Bright Future Project 3.0/_DSC0073.jpg' },
+                    { type: 'image', src: 'testinghtml/media/Bright Future Project 3.0/_DSC0074.jpg' },
+                    { type: 'image', src: 'testinghtml/media/Bright Future Project 3.0/_DSC0075.jpg' },
+                    { type: 'image', src: 'testinghtml/media/Bright Future Project 3.0/_DSC0076.jpg' },
+                    { type: 'image', src: 'testinghtml/media/Bright Future Project 3.0/_DSC0077.jpg' },
+                    { type: 'image', src: 'testinghtml/media/Bright Future Project 3.0/_DSC0078.jpg' },
+                    { type: 'image', src: 'testinghtml/media/Bright Future Project 3.0/_DSC0079.jpg' },
+                    { type: 'image', src: 'testinghtml/media/Bright Future Project 3.0/_DSC0080.jpg' },
+                    { type: 'image', src: 'testinghtml/media/Bright Future Project 3.0/_DSC0081.jpg' },
+                    { type: 'image', src: 'testinghtml/media/Bright Future Project 3.0/_DSC0082.jpg' },
+                    { type: 'image', src: 'testinghtml/media/Bright Future Project 3.0/_DSC0083.jpg' },
+                    { type: 'image', src: 'testinghtml/media/Bright Future Project 3.0/_DSC0084.jpg' },
+                    { type: 'image', src: 'testinghtml/media/Bright Future Project 3.0/_DSC0085.jpg' },
+                    { type: 'image', src: 'testinghtml/media/Bright Future Project 3.0/_DSC0090.jpg' },
+                    { type: 'image', src: 'testinghtml/media/Bright Future Project 3.0/_DSC0092.jpg' },
+                    { type: 'image', src: 'testinghtml/media/Bright Future Project 3.0/_DSC0093.jpg' },
+                    { type: 'image', src: 'testinghtml/media/Bright Future Project 3.0/_DSC0094.jpg' },
+                    { type: 'image', src: 'testinghtml/media/Bright Future Project 3.0/_DSC0095.jpg' },
+                    { type: 'image', src: 'testinghtml/media/Bright Future Project 3.0/_DSC0099.jpg' },
+                    { type: 'image', src: 'testinghtml/media/Bright Future Project 3.0/_DSC0101.jpg' },
+                    { type: 'image', src: 'testinghtml/media/Bright Future Project 3.0/_DSC0103.jpg' },
+                    { type: 'image', src: 'testinghtml/media/Bright Future Project 3.0/_DSC0105.jpg' },
+                    { type: 'image', src: 'testinghtml/media/Bright Future Project 3.0/_DSC0106.jpg' },
+                    { type: 'image', src: 'testinghtml/media/Bright Future Project 3.0/_DSC0107 (2).jpg' },
+                    { type: 'image', src: 'testinghtml/media/Bright Future Project 3.0/_DSC0110.jpg' }
+                ]
+            },
+            bright_1: {
+                title: 'Bright Future Project 1.0',
+                description: 'Educational tour blending heritage and leadership lessons.',
+                items: [
+                    { type: 'image', src: 'testinghtml/media/Bright Future Project 1.0/IMG_9680.JPG' },
+                    { type: 'image', src: 'testinghtml/media/Bright Future Project 1.0/IMG_9702.JPG' },
+                    { type: 'image', src: 'testinghtml/media/Bright Future Project 1.0/IMG_9703.JPG' },
+                    { type: 'image', src: 'testinghtml/media/Bright Future Project 1.0/IMG_9719.JPG' },
+                    { type: 'image', src: 'testinghtml/media/Bright Future Project 1.0/IMG_9733.JPG' },
+                    { type: 'image', src: 'testinghtml/media/Bright Future Project 1.0/IMG_9735.JPG' },
+                    { type: 'image', src: 'testinghtml/media/Bright Future Project 1.0/IMG_9747.JPG' },
+                    { type: 'image', src: 'testinghtml/media/Bright Future Project 1.0/IMG_9748.JPG' },
+                    { type: 'image', src: 'testinghtml/media/Bright Future Project 1.0/IMG_9786.JPG' },
+                    { type: 'image', src: 'testinghtml/media/Bright Future Project 1.0/IMG_9787.JPG' },
+                    { type: 'image', src: 'testinghtml/media/Bright Future Project 1.0/IMG_9790.JPG' },
+                    { type: 'image', src: 'testinghtml/media/Bright Future Project 1.0/IMG_9791.JPG' },
+                    { type: 'image', src: 'testinghtml/media/Bright Future Project 1.0/IMG_9793.JPG' },
+                    { type: 'image', src: 'testinghtml/media/Bright Future Project 1.0/IMG_9794.JPG' },
+                    { type: 'image', src: 'testinghtml/media/Bright Future Project 1.0/IMG_9795.JPG' },
+                    { type: 'image', src: 'testinghtml/media/Bright Future Project 1.0/IMG_9796.JPG' },
+                    { type: 'image', src: 'testinghtml/media/Bright Future Project 1.0/IMG_9797.JPG' },
+                    { type: 'image', src: 'testinghtml/media/Bright Future Project 1.0/IMG_9798.JPG' },
+                    { type: 'image', src: 'testinghtml/media/Bright Future Project 1.0/IMG_9799.JPG' },
+                    { type: 'image', src: 'testinghtml/media/Bright Future Project 1.0/IMG_9800.JPG' },
+                    { type: 'image', src: 'testinghtml/media/Bright Future Project 1.0/IMG_9804.JPG' },
+                    { type: 'image', src: 'testinghtml/media/Bright Future Project 1.0/IMG_9807.JPG' },
+                    { type: 'image', src: 'testinghtml/media/Bright Future Project 1.0/IMG_9816.JPG' },
+                    { type: 'image', src: 'testinghtml/media/Bright Future Project 1.0/IMG_9827.JPG' },
+                    { type: 'image', src: 'testinghtml/media/Bright Future Project 1.0/IMG_9834.JPG' },
+                    { type: 'image', src: 'testinghtml/media/Bright Future Project 1.0/IMG_9841.JPG' },
+                    { type: 'image', src: 'testinghtml/media/Bright Future Project 1.0/IMG_9842.JPG' },
+                    { type: 'image', src: 'testinghtml/media/Bright Future Project 1.0/IMG_9843.JPG' },
+                    { type: 'image', src: 'testinghtml/media/Bright Future Project 1.0/IMG_9846.JPG' },
+                    { type: 'image', src: 'testinghtml/media/Bright Future Project 1.0/IMG_9848.JPG' },
+                    { type: 'image', src: 'testinghtml/media/Bright Future Project 1.0/IMG_9853.JPG' },
+                    { type: 'image', src: 'testinghtml/media/Bright Future Project 1.0/IMG_9855.JPG' },
+                    { type: 'image', src: 'testinghtml/media/Bright Future Project 1.0/IMG_9858.JPG' },
+                    { type: 'image', src: 'testinghtml/media/Bright Future Project 1.0/IMG_9859.JPG' },
+                    { type: 'image', src: 'testinghtml/media/Bright Future Project 1.0/IMG_9867.JPG' },
+                    { type: 'image', src: 'testinghtml/media/Bright Future Project 1.0/IMG_9868.JPG' },
+                    { type: 'image', src: 'testinghtml/media/Bright Future Project 1.0/IMG_9870.JPG' },
+                    { type: 'image', src: 'testinghtml/media/Bright Future Project 1.0/IMG_9871.JPG' },
+                    { type: 'image', src: 'testinghtml/media/Bright Future Project 1.0/IMG_9876.JPG' },
+                    { type: 'image', src: 'testinghtml/media/Bright Future Project 1.0/IMG_9877.JPG' },
+                    { type: 'image', src: 'testinghtml/media/Bright Future Project 1.0/IMG_9878.JPG' },
+                    { type: 'image', src: 'testinghtml/media/Bright Future Project 1.0/IMG_9879.JPG' },
+                    { type: 'image', src: 'testinghtml/media/Bright Future Project 1.0/IMG_9881.JPG' },
+                    { type: 'image', src: 'testinghtml/media/Bright Future Project 1.0/IMG_9883.JPG' },
+                    { type: 'image', src: 'testinghtml/media/Bright Future Project 1.0/IMG_9884.JPG' },
+                    { type: 'image', src: 'testinghtml/media/Bright Future Project 1.0/IMG_9888.JPG' },
+                    { type: 'image', src: 'testinghtml/media/Bright Future Project 1.0/IMG_9890.JPG' },
+                    { type: 'image', src: 'testinghtml/media/Bright Future Project 1.0/IMG_9892.JPG' },
+                    { type: 'image', src: 'testinghtml/media/Bright Future Project 1.0/IMG_9894.JPG' },
+                    { type: 'image', src: 'testinghtml/media/Bright Future Project 1.0/IMG_9900.JPG' },
+                    { type: 'image', src: 'testinghtml/media/Bright Future Project 1.0/IMG_9904.JPG' },
+                    { type: 'image', src: 'testinghtml/media/Bright Future Project 1.0/IMG_9910.JPG' },
+                    { type: 'image', src: 'testinghtml/media/Bright Future Project 1.0/IMG_9914.JPG' },
+                    { type: 'image', src: 'testinghtml/media/Bright Future Project 1.0/IMG_9923.JPG' },
+                    { type: 'image', src: 'testinghtml/media/Bright Future Project 1.0/IMG_9924.JPG' },
+                    { type: 'image', src: 'testinghtml/media/Bright Future Project 1.0/IMG_9925.JPG' },
+                    { type: 'image', src: 'testinghtml/media/Bright Future Project 1.0/IMG_9926.JPG' },
+                    { type: 'image', src: 'testinghtml/media/Bright Future Project 1.0/IMG_9935.JPG' },
+                    { type: 'image', src: 'testinghtml/media/Bright Future Project 1.0/IMG_9938.JPG' },
+                    { type: 'image', src: 'testinghtml/media/Bright Future Project 1.0/IMG_9942.JPG' },
+                    { type: 'image', src: 'testinghtml/media/Bright Future Project 1.0/IMG_9963.JPG' },
+                    { type: 'image', src: 'testinghtml/media/Bright Future Project 1.0/IMG_9967.JPG' },
+                    { type: 'image', src: 'testinghtml/media/Bright Future Project 1.0/IMG_9968.JPG' },
+                    { type: 'image', src: 'testinghtml/media/Bright Future Project 1.0/IMG_9971.JPG' },
+                    { type: 'image', src: 'testinghtml/media/Bright Future Project 1.0/IMG_9974.JPG' },
+                    { type: 'image', src: 'testinghtml/media/Bright Future Project 1.0/IMG_9980.JPG' },
+                    { type: 'image', src: 'testinghtml/media/Bright Future Project 1.0/IMG_9982.JPG' },
+                    { type: 'image', src: 'testinghtml/media/Bright Future Project 1.0/IMG_9986.JPG' }
+                ]
+            },
+            fateh_1: {
+                title: 'Fateh 1.0',
+                description: 'Early-stage character building and outreach moments.',
+                items: [
+                    { type: 'image', src: 'testinghtml/media/Fateh 1.0/DSC_0274.JPG' },
+                    { type: 'image', src: 'testinghtml/media/Fateh 1.0/DSC_0275.JPG' },
+                    { type: 'image', src: 'testinghtml/media/Fateh 1.0/DSC_0276.JPG' },
+                    { type: 'image', src: 'testinghtml/media/Fateh 1.0/DSC_0277.JPG' },
+                    { type: 'image', src: 'testinghtml/media/Fateh 1.0/DSC_0278.JPG' },
+                    { type: 'image', src: 'testinghtml/media/Fateh 1.0/DSC_0279.JPG' },
+                    { type: 'image', src: 'testinghtml/media/Fateh 1.0/DSC_0283.JPG' },
+                    { type: 'image', src: 'testinghtml/media/Fateh 1.0/DSC_0284.JPG' },
+                    { type: 'image', src: 'testinghtml/media/Fateh 1.0/DSC_0285.JPG' },
+                    { type: 'image', src: 'testinghtml/media/Fateh 1.0/DSC_0293.JPG' },
+                    { type: 'image', src: 'testinghtml/media/Fateh 1.0/DSC_0295.JPG' },
+                    { type: 'image', src: 'testinghtml/media/Fateh 1.0/DSC_0296.JPG' },
+                    { type: 'image', src: 'testinghtml/media/Fateh 1.0/DSC_0298.JPG' },
+                    { type: 'image', src: 'testinghtml/media/Fateh 1.0/DSC_0299.JPG' },
+                    { type: 'image', src: 'testinghtml/media/Fateh 1.0/DSC_0301.JPG' },
+                    { type: 'image', src: 'testinghtml/media/Fateh 1.0/DSC_0302.JPG' },
+                    { type: 'image', src: 'testinghtml/media/Fateh 1.0/DSC_0307.JPG' },
+                    { type: 'image', src: 'testinghtml/media/Fateh 1.0/DSC_0308.JPG' },
+                    { type: 'image', src: 'testinghtml/media/Fateh 1.0/DSC_0311.JPG' },
+                    { type: 'image', src: 'testinghtml/media/Fateh 1.0/DSC_0316.JPG' },
+                    { type: 'image', src: 'testinghtml/media/Fateh 1.0/DSC_0321.JPG' },
+                    { type: 'image', src: 'testinghtml/media/Fateh 1.0/DSC_0323.JPG' },
+                    { type: 'image', src: 'testinghtml/media/Fateh 1.0/DSC_0325.JPG' },
+                    { type: 'image', src: 'testinghtml/media/Fateh 1.0/DSC_0330.JPG' },
+                    { type: 'image', src: 'testinghtml/media/Fateh 1.0/DSC_0331.JPG' },
+                    { type: 'image', src: 'testinghtml/media/Fateh 1.0/DSC_0333.JPG' },
+                    { type: 'image', src: 'testinghtml/media/Fateh 1.0/DSC_0334.JPG' },
+                    { type: 'image', src: 'testinghtml/media/Fateh 1.0/DSC_0336.JPG' },
+                    { type: 'image', src: 'testinghtml/media/Fateh 1.0/DSC_0343.JPG' },
+                    { type: 'image', src: 'testinghtml/media/Fateh 1.0/DSC_0344.JPG' },
+                    { type: 'image', src: 'testinghtml/media/Fateh 1.0/DSC_0347.JPG' },
+                    { type: 'image', src: 'testinghtml/media/Fateh 1.0/DSC_0351.JPG' }
+                ]
+            },
+            fateh_2: {
+                title: 'Fateh 2.0',
+                description: 'Mentorship, sports drills, and halaqah circles.',
+                items: [
+                    { type: 'image', src: 'testinghtml/media/Fateh 2.0/IMG_2968.JPG' },
+                    { type: 'image', src: 'testinghtml/media/Fateh 2.0/IMG_2972.JPG' },
+                    { type: 'image', src: 'testinghtml/media/Fateh 2.0/IMG_2974.JPG' },
+                    { type: 'image', src: 'testinghtml/media/Fateh 2.0/IMG_3013.JPG' },
+                    { type: 'image', src: 'testinghtml/media/Fateh 2.0/IMG_3022.JPG' },
+                    { type: 'image', src: 'testinghtml/media/Fateh 2.0/IMG_3023.JPG' },
+                    { type: 'image', src: 'testinghtml/media/Fateh 2.0/IMG_3035.JPG' },
+                    { type: 'image', src: 'testinghtml/media/Fateh 2.0/IMG_3036.JPG' },
+                    { type: 'image', src: 'testinghtml/media/Fateh 2.0/IMG_3037.JPG' },
+                    { type: 'image', src: 'testinghtml/media/Fateh 2.0/IMG_3039.JPG' },
+                    { type: 'image', src: 'testinghtml/media/Fateh 2.0/IMG_3049.JPG' },
+                    { type: 'image', src: 'testinghtml/media/Fateh 2.0/IMG_3051.JPG' },
+                    { type: 'image', src: 'testinghtml/media/Fateh 2.0/IMG_3055.JPG' },
+                    { type: 'image', src: 'testinghtml/media/Fateh 2.0/IMG_3056.JPG' },
+                    { type: 'image', src: 'testinghtml/media/Fateh 2.0/IMG_3057.JPG' },
+                    { type: 'image', src: 'testinghtml/media/Fateh 2.0/IMG_3070.JPG' },
+                    { type: 'image', src: 'testinghtml/media/Fateh 2.0/IMG_3114.JPG' },
+                    { type: 'image', src: 'testinghtml/media/Fateh 2.0/test.JPG' }
+                ]
+            },
+            fateh_3: {
+                title: 'Fateh 3.0',
+                description: 'Rural outreach, sports, and community engagement.',
+                items: [
+                    { type: 'image', src: 'testinghtml/media/Fateh 3.0/IMG_8743.jpg' },
+                    { type: 'image', src: 'testinghtml/media/Fateh 3.0/IMG_8744.jpg' },
+                    { type: 'image', src: 'testinghtml/media/Fateh 3.0/IMG_8745 (1).jpg' },
+                    { type: 'image', src: 'testinghtml/media/Fateh 3.0/IMG_8747 (1).jpg' },
+                    { type: 'image', src: 'testinghtml/media/Fateh 3.0/IMG_8752.jpg' },
+                    { type: 'image', src: 'testinghtml/media/Fateh 3.0/IMG_8755.jpg' },
+                    { type: 'image', src: 'testinghtml/media/Fateh 3.0/IMG_8756.jpg' },
+                    { type: 'image', src: 'testinghtml/media/Fateh 3.0/IMG_8759 (1).jpg' },
+                    { type: 'image', src: 'testinghtml/media/Fateh 3.0/IMG_8760.jpg' },
+                    { type: 'image', src: 'testinghtml/media/Fateh 3.0/IMG_8761.jpg' },
+                    { type: 'image', src: 'testinghtml/media/Fateh 3.0/IMG_8762.jpg' },
+                    { type: 'image', src: 'testinghtml/media/Fateh 3.0/IMG_8764.jpg' },
+                    { type: 'image', src: 'testinghtml/media/Fateh 3.0/IMG_8771.jpg' },
+                    { type: 'image', src: 'testinghtml/media/Fateh 3.0/IMG_8780.jpg' },
+                    { type: 'image', src: 'testinghtml/media/Fateh 3.0/IMG_8783.jpg' },
+                    { type: 'image', src: 'testinghtml/media/Fateh 3.0/IMG_8784.jpg' },
+                    { type: 'image', src: 'testinghtml/media/Fateh 3.0/IMG_8795.jpg' },
+                    { type: 'image', src: 'testinghtml/media/Fateh 3.0/IMG_8797.jpg' },
+                    { type: 'image', src: 'testinghtml/media/Fateh 3.0/IMG_8803.jpg' },
+                    { type: 'image', src: 'testinghtml/media/Fateh 3.0/IMG_8805.jpg' },
+                    { type: 'image', src: 'testinghtml/media/Fateh 3.0/IMG_8806.jpg' },
+                    { type: 'image', src: 'testinghtml/media/Fateh 3.0/IMG_8807.jpg' },
+                    { type: 'image', src: 'testinghtml/media/Fateh 3.0/IMG_8808.jpg' },
+                    { type: 'image', src: 'testinghtml/media/Fateh 3.0/IMG_8811.jpg' },
+                    { type: 'image', src: 'testinghtml/media/Fateh 3.0/IMG_8812.jpg' },
+                    { type: 'image', src: 'testinghtml/media/Fateh 3.0/IMG_8813.jpg' },
+                    { type: 'image', src: 'testinghtml/media/Fateh 3.0/IMG_8824.jpg' },
+                    { type: 'image', src: 'testinghtml/media/Fateh 3.0/IMG_8854 (1).jpg' },
+                    { type: 'image', src: 'testinghtml/media/Fateh 3.0/IMG_8857 (1).jpg' },
+                    { type: 'image', src: 'testinghtml/media/Fateh 3.0/IMG_8863.jpg' },
+                    { type: 'image', src: 'testinghtml/media/Fateh 3.0/IMG_8871.jpg' },
+                    { type: 'image', src: 'testinghtml/media/Fateh 3.0/IMG_8879.jpg' },
+                    { type: 'image', src: 'testinghtml/media/Fateh 3.0/IMG_8884.jpg' },
+                    { type: 'image', src: 'testinghtml/media/Fateh 3.0/IMG_8891.jpg' },
+                    { type: 'image', src: 'testinghtml/media/Fateh 3.0/IMG_8914.jpg' },
+                    { type: 'image', src: 'testinghtml/media/Fateh 3.0/IMG_8915.jpg' },
+                    { type: 'image', src: 'testinghtml/media/Fateh 3.0/IMG_8963.jpg' },
+                    { type: 'image', src: 'testinghtml/media/Fateh 3.0/IMG_8965 (1).jpg' },
+                    { type: 'image', src: 'testinghtml/media/Fateh 3.0/IMG_8966.jpg' },
+                    { type: 'image', src: 'testinghtml/media/Fateh 3.0/IMG_8982.jpg' },
+                    { type: 'image', src: 'testinghtml/media/Fateh 3.0/IMG_8994.jpg' },
+                    { type: 'image', src: 'testinghtml/media/Fateh 3.0/IMG_9069.jpg' },
+                    { type: 'image', src: 'testinghtml/media/Fateh 3.0/IMG_9088.jpg' },
+                    { type: 'image', src: 'testinghtml/media/Fateh 3.0/IMG_9116.jpg' },
+                    { type: 'image', src: 'testinghtml/media/Fateh 3.0/IMG_9128.jpg' },
+                    { type: 'image', src: 'testinghtml/media/Fateh 3.0/IMG_9149.jpg' },
+                    { type: 'image', src: 'testinghtml/media/Fateh 3.0/_DSC9121.jpg' },
+                    { type: 'image', src: 'testinghtml/media/Fateh 3.0/_DSC9131.jpg' },
+                    { type: 'image', src: 'testinghtml/media/Fateh 3.0/_DSC9136.jpg' },
+                    { type: 'image', src: 'testinghtml/media/Fateh 3.0/_DSC9138.jpg' },
+                    { type: 'image', src: 'testinghtml/media/Fateh 3.0/_DSC9139.jpg' },
+                    { type: 'image', src: 'testinghtml/media/Fateh 3.0/_DSC9140.jpg' },
+                    { type: 'image', src: 'testinghtml/media/Fateh 3.0/_DSC9143.jpg' },
+                    { type: 'image', src: 'testinghtml/media/Fateh 3.0/_DSC9151.jpg' },
+                    { type: 'image', src: 'testinghtml/media/Fateh 3.0/_DSC9152.jpg' },
+                    { type: 'image', src: 'testinghtml/media/Fateh 3.0/_DSC9159.jpg' }
+                ]
+            },
+            aulad_2: {
+                title: 'Aulad 2.0',
+                description: 'Primary school program with ethics and character focus.',
+                items: [
+                    { type: 'image', src: 'testinghtml/media/Aulad 2.0/IMG_2831.jpg' },
+                    { type: 'image', src: 'testinghtml/media/Aulad 2.0/IMG_2832.jpg' },
+                    { type: 'image', src: 'testinghtml/media/Aulad 2.0/IMG_2839.jpg' },
+                    { type: 'image', src: 'testinghtml/media/Aulad 2.0/IMG_2844.JPG' },
+                    { type: 'image', src: 'testinghtml/media/Aulad 2.0/IMG_2845.JPG' },
+                    { type: 'image', src: 'testinghtml/media/Aulad 2.0/IMG_2852.JPG' },
+                    { type: 'image', src: 'testinghtml/media/Aulad 2.0/IMG_2857.JPG' },
+                    { type: 'image', src: 'testinghtml/media/Aulad 2.0/IMG_2859.JPG' },
+                    { type: 'image', src: 'testinghtml/media/Aulad 2.0/IMG_2862.JPG' },
+                    { type: 'image', src: 'testinghtml/media/Aulad 2.0/IMG_2865.JPG' },
+                    { type: 'image', src: 'testinghtml/media/Aulad 2.0/IMG_2868.JPG' },
+                    { type: 'image', src: 'testinghtml/media/Aulad 2.0/IMG_2870.JPG' },
+                    { type: 'image', src: 'testinghtml/media/Aulad 2.0/IMG_2872.jpg' },
+                    { type: 'image', src: 'testinghtml/media/Aulad 2.0/IMG_2875.JPG' },
+                    { type: 'image', src: 'testinghtml/media/Aulad 2.0/IMG_2880.jpg' },
+                    { type: 'image', src: 'testinghtml/media/Aulad 2.0/IMG_2884.JPG' },
+                    { type: 'image', src: 'testinghtml/media/Aulad 2.0/IMG_2886.JPG' },
+                    { type: 'image', src: 'testinghtml/media/Aulad 2.0/IMG_2887.JPG' },
+                    { type: 'image', src: 'testinghtml/media/Aulad 2.0/IMG_2889.jpg' },
+                    { type: 'image', src: 'testinghtml/media/Aulad 2.0/IMG_2890.JPG' },
+                    { type: 'image', src: 'testinghtml/media/Aulad 2.0/IMG_2893.JPG' },
+                    { type: 'image', src: 'testinghtml/media/Aulad 2.0/IMG_2895.JPG' },
+                    { type: 'image', src: 'testinghtml/media/Aulad 2.0/IMG_2898.JPG' },
+                    { type: 'image', src: 'testinghtml/media/Aulad 2.0/IMG_2899.JPG' },
+                    { type: 'image', src: 'testinghtml/media/Aulad 2.0/IMG_2905.JPG' },
+                    { type: 'image', src: 'testinghtml/media/Aulad 2.0/IMG_2912.jpg' }
+                ]
+            },
+            aulad_3: {
+                title: 'Aulad 3.0',
+                description: 'Community engagement and outdoor activities.',
+                items: [
+                    { type: 'image', src: 'testinghtml/media/Aulad 3.0/DSC_0738.JPG' },
+                    { type: 'image', src: 'testinghtml/media/Aulad 3.0/DSC_0743.JPG' },
+                    { type: 'image', src: 'testinghtml/media/Aulad 3.0/DSC_0745.JPG' },
+                    { type: 'image', src: 'testinghtml/media/Aulad 3.0/DSC_0748.JPG' },
+                    { type: 'image', src: 'testinghtml/media/Aulad 3.0/DSC_0756.JPG' },
+                    { type: 'image', src: 'testinghtml/media/Aulad 3.0/DSC_0758.JPG' },
+                    { type: 'image', src: 'testinghtml/media/Aulad 3.0/DSC_0763.JPG' },
+                    { type: 'image', src: 'testinghtml/media/Aulad 3.0/DSC_0765.JPG' },
+                    { type: 'image', src: 'testinghtml/media/Aulad 3.0/DSC_0766.JPG' },
+                    { type: 'image', src: 'testinghtml/media/Aulad 3.0/DSC_0767.JPG' },
+                    { type: 'image', src: 'testinghtml/media/Aulad 3.0/DSC_0768.JPG' },
+                    { type: 'image', src: 'testinghtml/media/Aulad 3.0/DSC_0770.JPG' },
+                    { type: 'image', src: 'testinghtml/media/Aulad 3.0/DSC_0772.JPG' },
+                    { type: 'image', src: 'testinghtml/media/Aulad 3.0/DSC_0780.JPG' },
+                    { type: 'image', src: 'testinghtml/media/Aulad 3.0/DSC_0787.JPG' },
+                    { type: 'image', src: 'testinghtml/media/Aulad 3.0/DSC_0792.JPG' },
+                    { type: 'image', src: 'testinghtml/media/Aulad 3.0/DSC_0793.JPG' },
+                    { type: 'image', src: 'testinghtml/media/Aulad 3.0/DSC_0794.JPG' },
+                    { type: 'image', src: 'testinghtml/media/Aulad 3.0/DSC_0795.JPG' },
+                    { type: 'image', src: 'testinghtml/media/Aulad 3.0/DSC_0796.JPG' },
+                    { type: 'image', src: 'testinghtml/media/Aulad 3.0/DSC_0797.JPG' },
+                    { type: 'image', src: 'testinghtml/media/Aulad 3.0/DSC_0802.JPG' },
+                    { type: 'image', src: 'testinghtml/media/Aulad 3.0/DSC_0803.JPG' },
+                    { type: 'image', src: 'testinghtml/media/Aulad 3.0/DSC_0804.JPG' },
+                    { type: 'image', src: 'testinghtml/media/Aulad 3.0/DSC_0806.JPG' },
+                    { type: 'image', src: 'testinghtml/media/Aulad 3.0/DSC_0808.JPG' },
+                    { type: 'image', src: 'testinghtml/media/Aulad 3.0/DSC_0810.JPG' },
+                    { type: 'image', src: 'testinghtml/media/Aulad 3.0/DSC_0812.JPG' },
+                    { type: 'image', src: 'testinghtml/media/Aulad 3.0/DSC_0815.JPG' },
+                    { type: 'image', src: 'testinghtml/media/Aulad 3.0/DSC_0816.JPG' },
+                    { type: 'image', src: 'testinghtml/media/Aulad 3.0/DSC_0817.JPG' },
+                    { type: 'image', src: 'testinghtml/media/Aulad 3.0/DSC_0818.JPG' },
+                    { type: 'image', src: 'testinghtml/media/Aulad 3.0/DSC_0820.JPG' },
+                    { type: 'image', src: 'testinghtml/media/Aulad 3.0/DSC_0827.JPG' },
+                    { type: 'image', src: 'testinghtml/media/Aulad 3.0/DSC_0828.JPG' },
+                    { type: 'image', src: 'testinghtml/media/Aulad 3.0/DSC_0829.JPG' },
+                    { type: 'image', src: 'testinghtml/media/Aulad 3.0/DSC_0830.JPG' },
+                    { type: 'image', src: 'testinghtml/media/Aulad 3.0/DSC_0834.JPG' },
+                    { type: 'image', src: 'testinghtml/media/Aulad 3.0/DSC_0841.JPG' },
+                    { type: 'image', src: 'testinghtml/media/Aulad 3.0/DSC_0846.JPG' },
+                    { type: 'image', src: 'testinghtml/media/Aulad 3.0/DSC_0850.JPG' },
+                    { type: 'image', src: 'testinghtml/media/Aulad 3.0/DSC_0853.JPG' },
+                    { type: 'image', src: 'testinghtml/media/Aulad 3.0/DSC_0858.JPG' },
+                    { type: 'image', src: 'testinghtml/media/Aulad 3.0/DSC_0864.JPG' },
+                    { type: 'image', src: 'testinghtml/media/Aulad 3.0/DSC_0866.JPG' },
+                    { type: 'image', src: 'testinghtml/media/Aulad 3.0/DSC_0868.JPG' },
+                    { type: 'image', src: 'testinghtml/media/Aulad 3.0/DSC_0873.JPG' },
+                    { type: 'image', src: 'testinghtml/media/Aulad 3.0/DSC_0874.JPG' },
+                    { type: 'image', src: 'testinghtml/media/Aulad 3.0/DSC_0882.JPG' },
+                    { type: 'image', src: 'testinghtml/media/Aulad 3.0/DSC_0885.JPG' },
+                    { type: 'image', src: 'testinghtml/media/Aulad 3.0/DSC_0890.JPG' },
+                    { type: 'image', src: 'testinghtml/media/Aulad 3.0/DSC_0895.JPG' },
+                    { type: 'image', src: 'testinghtml/media/Aulad 3.0/DSC_0901.JPG' },
+                    { type: 'image', src: 'testinghtml/media/Aulad 3.0/DSC_0915.JPG' },
+                    { type: 'image', src: 'testinghtml/media/Aulad 3.0/DSC_0920.JPG' },
+                    { type: 'image', src: 'testinghtml/media/Aulad 3.0/DSC_0922.JPG' }
+                ]
+            }
+        };
+
+        const overlay = document.getElementById('album-overlay');
+        const viewer = document.getElementById('album-viewer');
+        const thumbs = document.getElementById('album-thumbs');
+        const albumTitle = document.getElementById('album-title');
+        const albumDesc = document.getElementById('album-desc');
+        const albumMeta = document.getElementById('album-meta');
+        const btnNext = document.getElementById('album-next');
+        const btnPrev = document.getElementById('album-prev');
+        const btnClose = document.getElementById('album-close');
+
+        let currentAlbum = null;
+        let currentIndex = 0;
+
+        const renderItem = (item) => {
+            if (!item) return;
+            viewer.innerHTML = '';
+            if (item.type === 'video') {
+                const video = document.createElement('video');
+                video.controls = true;
+                video.className = 'w-full h-full object-contain bg-black';
+                const source = document.createElement('source');
+                source.src = item.src;
+                source.type = 'video/mp4';
+                video.appendChild(source);
+                viewer.appendChild(video);
+            } else {
+                const img = document.createElement('img');
+                img.src = item.src;
+                img.className = 'w-full h-full object-contain bg-black';
+                img.alt = item.alt || 'Album item';
+                viewer.appendChild(img);
+            }
+        };
+
+        const renderThumbs = (items) => {
+            thumbs.innerHTML = '';
+            items.forEach((item, idx) => {
+                const btn = document.createElement('button');
+                btn.className = 'relative overflow-hidden rounded-lg border border-white/10 hover:border-white/40 transition';
+                btn.dataset.index = idx;
+                const thumbSrc = item.thumb || item.src;
+                btn.innerHTML = `
+                    <img src="${thumbSrc}" class="w-full h-24 object-cover" alt="thumb">
+                    ${item.type === 'video' ? '<span class="absolute inset-0 bg-black/40 grid place-items-center text-xs mono">Video</span>' : ''}
+                `;
+                btn.addEventListener('click', () => {
+                    currentIndex = idx;
+                    renderItem(items[idx]);
+                    highlightThumb(idx);
+                });
+                thumbs.appendChild(btn);
+            });
+        };
+
+        const highlightThumb = (idx) => {
+            thumbs.querySelectorAll('button').forEach((btn) => btn.classList.remove('thumb-active'));
+            const active = thumbs.querySelector(`button[data-index="${idx}"]`);
+            if (active) active.classList.add('thumb-active');
+        };
+
+        const openAlbum = (key) => {
+            const album = albums[key];
+            if (!album) return;
+            currentAlbum = album;
+            currentIndex = 0;
+            albumTitle.textContent = album.title;
+            albumDesc.textContent = album.description;
+            albumMeta.textContent = `${album.items.length} items`;
+            renderThumbs(album.items);
+            renderItem(album.items[currentIndex]);
+            highlightThumb(currentIndex);
+            overlay.classList.remove('hidden');
+            document.body.style.overflow = 'hidden';
+        };
+
+        const closeAlbum = () => {
+            overlay.classList.add('hidden');
+            document.body.style.overflow = '';
+            viewer.innerHTML = '';
+        };
+
+        btnNext.addEventListener('click', () => {
+            if (!currentAlbum) return;
+            currentIndex = (currentIndex + 1) % currentAlbum.items.length;
+            renderItem(currentAlbum.items[currentIndex]);
+            highlightThumb(currentIndex);
+        });
+
+        btnPrev.addEventListener('click', () => {
+            if (!currentAlbum) return;
+            currentIndex = (currentIndex - 1 + currentAlbum.items.length) % currentAlbum.items.length;
+            renderItem(currentAlbum.items[currentIndex]);
+            highlightThumb(currentIndex);
+        });
+
+        btnClose.addEventListener('click', closeAlbum);
+
+        overlay.addEventListener('click', (e) => {
+            if (e.target === overlay) closeAlbum();
+        });
+
+        document.addEventListener('keydown', (e) => {
+            if (overlay.classList.contains('hidden')) return;
+            if (e.key === 'Escape') closeAlbum();
+            if (e.key === 'ArrowRight') btnNext.click();
+            if (e.key === 'ArrowLeft') btnPrev.click();
+        });
+
+        document.querySelectorAll('.open-album').forEach((btn) => {
+            btn.addEventListener('click', () => openAlbum(btn.dataset.album));
+        });
+
+        // Archive cards click handlers
+        document.querySelectorAll('.open-archive').forEach((card) => {
+            card.addEventListener('click', () => openAlbum(card.dataset.album));
+        });
+
+        // Smooth rotating gallery on hover (preload + throttle)
+        const archiveCards = document.querySelectorAll('.open-archive');
+        const rotationStates = new Map();
+
+        const preloadAlbumImages = (album) => {
+            if (!album || !album.items) return;
+            album.items.forEach((item) => {
+                if (item.type !== 'image') return;
+                const img = new Image();
+                img.decoding = 'async';
+                img.loading = 'lazy';
+                img.src = item.src;
+            });
+        };
+
+        // Preload once to avoid stutter on hover
+        Object.values(albums).forEach(preloadAlbumImages);
+
+        const startHoverRotation = (card, img, album) => {
+            let currentRotationIndex = 0;
+            let lastSwap = 0;
+            const intervalMs = 800; // slower swap = smoother
+
+            const step = (ts) => {
+                const state = rotationStates.get(card);
+                if (!state || !state.active) return;
+                if (ts - lastSwap >= intervalMs) {
+                    lastSwap = ts;
+                    currentRotationIndex = (currentRotationIndex + 1) % album.items.length;
+                    const item = album.items[currentRotationIndex];
+                    if (item && item.type === 'image') {
+                        img.decoding = 'async';
+                        img.loading = 'lazy';
+                        img.src = item.src;
+                    }
+                }
+                state.rafId = requestAnimationFrame(step);
+            };
+
+            const state = { active: true, rafId: requestAnimationFrame(step) };
+            rotationStates.set(card, state);
+        };
+
+        const stopHoverRotation = (card, img, album) => {
+            const state = rotationStates.get(card);
+            if (state && state.rafId) cancelAnimationFrame(state.rafId);
+            rotationStates.delete(card);
+            if (album && album.items && album.items.length > 0) {
+                const first = album.items[0];
+                if (first && first.type === 'image') {
+                    img.src = first.src;
+                }
+            }
+        };
+
+        archiveCards.forEach((card) => {
+            const img = card.querySelector('img');
+            const albumKey = card.dataset.album;
+
+            card.addEventListener('mouseenter', () => {
+                const album = albums[albumKey];
+                if (!img || !album || album.items.length <= 1) return;
+                startHoverRotation(card, img, album);
+            });
+
+            card.addEventListener('mouseleave', () => {
+                const album = albums[albumKey];
+                if (!img || !album) return;
+                stopHoverRotation(card, img, album);
+            });
+        });
+
+        // Horizontal scroll with mouse wheel
+        const archiveGallery = document.querySelector('.archive-gallery');
+        if (archiveGallery) {
+            archiveGallery.addEventListener('wheel', (evt) => {
+                evt.preventDefault();
+                archiveGallery.scrollLeft += evt.deltaY;
+            });
+        }
+
+        // Manual photo mapping system
+        // Add your name → filename mappings below
+        const photoMappings = {
+            // HIGH COMMITTEE
+            'Hanania binti Md Faizal': 'Hanania.JPG',
+            'Harith Danial bin Hanafi': '',
+            'Nadia Soraya Elias': 'Farisyah.jpg',
+            'Nurul Izzah binti Ahmad Fadzil': "Izzah.JPG",
+            'Nur Qistina Natasha binti Ramlan': 'Qistina.jpg',
+            'Sharifah Balqis binti Syed Mohd Zaid': 'sharifah.jpg',
+            'Muhammad Hazim Bin Mansor': 'Hazim.jpg',
+            
+            // HUMAN RESOURCES
+            'Irsyad Fahmi bin Miswan': 'Irsyad.JPG',
+            'Anis Ruhaya Amani binti Abdul Jalil': 'Anis_.jpg',
+            'Nurin Batrisya @ Siti Nur Rihhadatul Aisy binti Mohammad Amir': 'Nurin.jpg',
+            
+            // ENTREPRENEURSHIP
+            'Muhammad Azwan bin Mohd Faizal': 'Azwan.jpg',
+            'Raja Nurul Nadia binti Raja Yahaya': 'raja.jpg',
+            'Muhammad Mukhrizq Wafiq bin Mohd Masri': 'Mukhrizq.JPG',
+            
+            // MULTIMEDIA
+            'Nur Iffa Firzanah binti Noor Affandy': 'Iffa.jpg',
+            'Nuha Adilah binti Muliadi': 'Nuha.jpg',
+            'Hasanawiyah binti Harun': 'Hasanawiyah.jpg',
+            
+            // AULAD
+            'Thaqif Najmi bin Tarmizi': 'Thaqif.jpg',
+            'Farah Khalisa binti Mohd Fadzli': 'Lisa.jpg',
+            'Nur Akma Qistina binti Zam Zam': 'Akma.jpg',
+            
+            // TRAINING & DEVELOPMENT
+            'Nurul Fatin Aliah binti Bahtiar': 'Fatin.jpg',
+            'Luqman bin Mohd Noradha': 'Luqman.JPG',
+            'Ahmad Syihaam bin Ahmad Rafizi': '',
+            
+            // FATEH
+            'Nurul Aliah Qamar binti Kamaruzaman': 'Qamar.jpg',
+            'Rusyaidi bin Mohd Husni': 'Rusyaidi.JPG',
+            'Nur Aathiqah binti Ajmal Ibrahim': 'Aatiqah.jpg'
+        };
+
+        (function assignManualPhotos() {
+            const photoDir = 'testinghtml/media/team-members/';
+            const cards = document.querySelectorAll('#lineup .card');
+            
+            cards.forEach(card => {
+                const nameElement = card.querySelector('.front .title p strong');
+                if (!nameElement) return;
+                
+                // Extract name text, removing &nbsp; and extra whitespace
+                const fullName = nameElement.textContent
+                    .replace(/\s+/g, ' ')
+                    .trim();
+                
+                // Debug logging
+                console.log('Card name:', fullName);
+                
+                // Find matching photo
+                const filename = photoMappings[fullName];
+                if (!filename) {
+                    console.log('No mapping found for:', fullName);
+                    return; // Skip if no mapping or empty string
+                }
+                console.log('Mapping found:', fullName, '->', filename);
+                
+                // Find the back element and update it
+                const backEl = card.querySelector('.back');
+                if (backEl) {
+                    const src = photoDir + encodeURI(filename);
+                    backEl.innerHTML = `<img src="${src}" alt="${fullName}" class="back-img">`;
+                }
+            });
+        })();
+
+        // Custom Cursor Logic
+        const cursor = document.getElementById('cursor');
+        document.addEventListener('mousemove', (e) => {
+            cursor.style.left = e.clientX + 'px';
+            cursor.style.top = e.clientY + 'px';
+        });
+        document.addEventListener('mousedown', () => cursor.style.transform = 'scale(0.8)');
+        document.addEventListener('mouseup', () => cursor.style.transform = 'scale(1)');
+    </script>
+</body>
+</html>
